@@ -19,16 +19,36 @@
 
 Instrumentation for Guidewire applications, including ClaimCenter and PolicyCenter.
 
+
 ## Installation
 
 1. Obtain the latest release from this repository.
-1. Extract the release into a local directory.
-1. Transfer the extension JAR file to the target server
-1. Copy the extension JAR file into the agent's `extensions` directory (relative to the directory containing the `newrelic.jar` file).
-    *Note:* Create the `extensions` directory if it does not exist.
-1. Restart your JVM
-1. After the app has reloaded, generate traffic against your app that will trigger transactions that you expect to see.
-1. To debug issues, set `log_level` to `finer` in `newrelic.yml`.
+2. Extract the release into a local directory.
+3. Transfer the extension JAR file to the target server.
+4. Set the following environment variables:
+
+   ```bash
+   export OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp.nr-data.net:4317
+   export OTEL_EXPORTER_OTLP_HEADERS="api-key=<newrelic_ingest_key>"
+   export OTEL_RESOURCE_ATTRIBUTES="service.name=<appname>"
+   ```
+
+5. Run your application with the following Java agent attributes:
+
+   ```bash
+   -javaagent:<path_to_OpenTelemetry_Agent>/opentelemetry-javaagent.jar \
+   -Dotel.javaagent.extensions=<path_to_guidewire_extension>/otel-guidewire-instrumentation-v3-1.1.jar \
+   -Dotel.javaagent.debug=true
+   ```
+
+6. Restart your Java application.
+7. After the application has reloaded, generate traffic against your app to trigger the distributed traces you expect to see.
+8. To stop debugging, set:
+
+   ```bash
+   -Dotel.javaagent.debug=false
+   ```
+
 
 ## Usage
 
